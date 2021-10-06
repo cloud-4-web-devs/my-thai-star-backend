@@ -1,0 +1,10 @@
+# first start PostgreSQL server, e.g: docker container run --rm -p 5432:5432 -e POSTGRES_PASSWORD=password  postgres
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.PostgreSQL81Dialect

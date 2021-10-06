@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+
+  backend:
+    build:
+      context: .
+    image: my-thai-star/backend
+    entrypoint:
+     - java
+     - -jar
+     - -Dspring.profiles.active=postgres
+     - /app.jar
+     - --server.port=8080
+     - --spring.datasource.url=jdbc:postgresql://db:5432/postgres
+     - --spring.datasource.username=postgres
+     - --spring.datasource.password=secret
+    ports:
+      - "7777:8080"
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: secret
