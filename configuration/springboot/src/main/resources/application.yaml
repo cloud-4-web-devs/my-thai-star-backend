@@ -1,11 +1,2 @@
-logging:
-  level:
-    root: INFO
-    web: DEBUG
-    org:
-      hibernate:
-        type: DEBUG
-        SQL: DEBUG
-
 server:
   port: 7777
