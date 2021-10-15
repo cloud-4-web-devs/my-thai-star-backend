@@ -5,18 +5,18 @@ services:
   backend:
     build:
       context: .
-    image: my-thai-star/backend
+    image: marekmatczak/mts-backend
     entrypoint:
      - java
      - -jar
      - -Dspring.profiles.active=postgres
      - /app.jar
-     - --server.port=8080
+     - --server.port=80
      - --spring.datasource.url=jdbc:postgresql://db:5432/postgres
      - --spring.datasource.username=postgres
      - --spring.datasource.password=secret
     ports:
-      - "7777:8080"
+      - "80:80"
     depends_on:
       - db
 
