@@ -7,10 +7,12 @@ import cloud4webdevs.mythaistar.common.port.out.TransactionPort;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @AllArgsConstructor
 @Configuration
-public class BookingAdapterInConfiguration {
+public class BookingAdapterInConfiguration implements WebMvcConfigurer {
 
     private final FindBookingByTokenPort findBookingByTokenPort;
 
@@ -27,6 +29,11 @@ public class BookingAdapterInConfiguration {
     private final FindTablesPort findTablesPort;
 
     private final FindBookingsPort findBookingsPort;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
+    }
 
     @Bean
     public CancelBookingUseCase cancelBookingUseCase() {
