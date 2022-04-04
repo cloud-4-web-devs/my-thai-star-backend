@@ -8,6 +8,7 @@ import software.amazon.awscdk.services.ecs.*;
 import software.amazon.awscdk.services.elasticloadbalancingv2.*;
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.elasticloadbalancingv2.Protocol;
+import software.amazon.awscdk.services.logs.LogGroup;
 import software.constructs.Construct;
 
 import java.util.*;
@@ -57,7 +58,33 @@ public class AwsTrainingInfra extends Stack {
                 .port(80)
                 .defaultTargetGroups(new ArrayList<>(Collections.singletonList(applicationTargetGroup)))
                 .build();
+
+        final LogGroup logGroup = LogGroup.Builder.create(this, "logGroup")
+                .logGroupName("awstraining-logs")
+                .build();
+
+        final AwsLogDriverProps awsLogDriverProps = AwsLogDriverProps.builder()
+                .logGroup(logGroup)
+                .streamPrefix("cdk")
+                .build();
+
+        final FargateTaskDefinition taskDefinition = FargateTaskDefinition.Builder.create(this, "taskDefinition")
+                .cpu(256)
+                .memoryLimitMiB(512)
+                .build();
+
+        taskDefinition.addContainer("taskDefinitionContainer", ContainerDefinitionOptions.builder()
+                .image(ContainerImage.fromEcrRepository(repository))
+                .portMappings(List.of(PortMapping.builder().containerPort(80).build()))
+                .logging(LogDrivers.awsLogs(awsLogDriverProps))
+                .build());
+
+        FargateService.Builder.create(this, "service")
+                .taskDefinition(taskDefinition)
+                .securityGroups(new ArrayList<>(Collections.singletonList(securityGroup)))
+                .serviceName("awstraining-service")
+                .cluster(cluster)
+                .build()
+                .attachToApplicationTargetGroup(applicationTargetGroup);
     }
 }
-
-
