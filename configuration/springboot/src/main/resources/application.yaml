@@ -1,2 +1,26 @@
 server:
-  port: 7777
+  port: 80
+
+management:
+  metrics:
+    web:
+      server:
+        requests-metric-name: "application:request"
+      client:
+        requests-metric-name: "application:client_request"
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: "/status"
+    enabled-by-default: false
+  endpoint:
+    health:
+      show-details: always
+      enabled: true
+    threaddump:
+      enabled: true
+
+  health:
+    status:
+      order: DOWN,OUT_OF_SERVICE,UNKNOWN,WARN,UP
