@@ -17,13 +17,17 @@ public class AwsTrainingInfra extends Stack {
     public AwsTrainingInfra(final Construct scope, final String name) {
         super(scope, name);
 
+        final Repository repository = Repository.Builder.create(this, "ecr")
+                .repositoryName("ecr-awstraining")
+                .build();
+
         final Vpc vpc = Vpc.Builder.create(this, "vpc")
                 .vpcName("vpc-awstraining")
                 .maxAzs(3)  // Default is all AZs in region
-                .build();
-
-        final Repository repository = Repository.Builder.create(this, "ecr")
-                .repositoryName("ecr-awstraining")
+                .gatewayEndpoints(Map.of(
+                        "S3", GatewayVpcEndpointOptions.builder()
+                                .service(GatewayVpcEndpointAwsService.S3)
+                                .build()))
                 .build();
 
         final Cluster cluster = Cluster.Builder.create(this, "cluster")
@@ -86,5 +90,19 @@ public class AwsTrainingInfra extends Stack {
                 .cluster(cluster)
                 .build()
                 .attachToApplicationTargetGroup(applicationTargetGroup);
+
+        // Endpoints
+        final String endpointPrefix = "com.amazonaws.eu-central-1.";
+        final String[] endpoints = {"ecr.api", "ecr.dkr", "logs", "ssm"};
+        for (final String id : endpoints){
+            InterfaceVpcEndpoint.Builder.create(this, id)
+                    .vpc(vpc)
+                    .service(new InterfaceVpcEndpointService(endpointPrefix + id))
+                    .securityGroups(new ArrayList<>(Collections.singletonList(securityGroup)))
+                    .subnets(SubnetSelection.builder()
+                            .subnets(vpc.getPrivateSubnets())
+                            .build())
+                    .build();
+        }
     }
 }
