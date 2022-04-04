@@ -50,6 +50,7 @@
         <module>booking/booking-adapter-in-springweb</module>
         <module>booking/booking-adapter-out-jpa</module>
         <module>configuration/springboot</module>
+        <module>aws-structure</module>
     </modules>
 
     <dependencies>
