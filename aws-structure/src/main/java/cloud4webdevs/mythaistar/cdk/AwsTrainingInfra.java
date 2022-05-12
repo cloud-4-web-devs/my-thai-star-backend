@@ -39,16 +39,15 @@ public class AwsTrainingInfra extends Stack {
                 .securityGroupName("securityGroup-awstraining")
                 .vpc(vpc)
                 .build();
-        securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(80), "Application access");
-        securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(443), "Access to ecr");
+        securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(443), "Access to ecr and application access https");
 
-        final ApplicationTargetGroup applicationTargetGroup = ApplicationTargetGroup.Builder.create(this, "tg")
+        final ApplicationTargetGroup applicationHttpsTargetGroup = ApplicationTargetGroup.Builder.create(this, "tgHttps")
                 .targetGroupName("tg-awstraining")
-                .port(80)
-                .protocol(ApplicationProtocol.HTTP)
+                .port(443)
+                .protocol(ApplicationProtocol.HTTPS)
                 .targetType(TargetType.IP)
                 .vpc(vpc)
-                .healthCheck(HealthCheck.builder().protocol(Protocol.HTTP).timeout(Duration.seconds(120)).path("/status/health/ping").build())
+                .healthCheck(HealthCheck.builder().protocol(Protocol.HTTPS).timeout(Duration.seconds(120)).interval(Duration.seconds(240)).path("/status/health/ping").build())
                 .build();
 
         final ApplicationLoadBalancer applicationLoadBalancer = ApplicationLoadBalancer.Builder.create(this, "alb")
@@ -57,10 +56,11 @@ public class AwsTrainingInfra extends Stack {
                 .internetFacing(true)
                 .build();
 
-        ApplicationListener.Builder.create(this, "listener")
+        ApplicationListener.Builder.create(this, "listenerHttps")
                 .loadBalancer(applicationLoadBalancer)
-                .port(80)
-                .defaultTargetGroups(new ArrayList<>(Collections.singletonList(applicationTargetGroup)))
+                .port(443)
+                .certificates(new ArrayList<>(Collections.singletonList(ListenerCertificate.fromArn("arn:aws:acm:eu-central-1:931105827624:certificate/c9853bf6-9fe0-4ac7-8258-2643bb811ea0"))))
+                .defaultTargetGroups(new ArrayList<>(Collections.singletonList(applicationHttpsTargetGroup)))
                 .build();
 
         final LogGroup logGroup = LogGroup.Builder.create(this, "logGroup")
@@ -89,7 +89,7 @@ public class AwsTrainingInfra extends Stack {
                 .serviceName("awstraining-service")
                 .cluster(cluster)
                 .build()
-                .attachToApplicationTargetGroup(applicationTargetGroup);
+                .attachToApplicationTargetGroup(applicationHttpsTargetGroup);
 
         // Endpoints
         final String endpointPrefix = "com.amazonaws.eu-central-1.";
