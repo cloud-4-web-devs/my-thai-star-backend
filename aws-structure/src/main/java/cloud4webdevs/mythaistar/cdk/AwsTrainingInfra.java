@@ -48,7 +48,7 @@ public class AwsTrainingInfra extends Stack {
                 .protocol(ApplicationProtocol.HTTP)
                 .targetType(TargetType.IP)
                 .vpc(vpc)
-                .healthCheck(HealthCheck.builder().protocol(Protocol.HTTP).timeout(Duration.seconds(120)).path("/status/health/ping").build())
+                .healthCheck(HealthCheck.builder().protocol(Protocol.HTTP).timeout(Duration.seconds(120)).interval(Duration.seconds(240)).path("/status/health/ping").build())
                 .build();
 
         final ApplicationLoadBalancer applicationLoadBalancer = ApplicationLoadBalancer.Builder.create(this, "alb")
