@@ -39,15 +39,16 @@ public class AwsTrainingInfra extends Stack {
                 .securityGroupName("securityGroup-awstraining")
                 .vpc(vpc)
                 .build();
-        securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(443), "Access to ecr and application access https");
+        securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(443), "Access to ecr and endpoints");
+        securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(80), "Access to application");
 
         final ApplicationTargetGroup applicationHttpsTargetGroup = ApplicationTargetGroup.Builder.create(this, "tgHttps")
                 .targetGroupName("tg-awstraining")
-                .port(443)
-                .protocol(ApplicationProtocol.HTTPS)
+                .port(80)
+                .protocol(ApplicationProtocol.HTTP)
                 .targetType(TargetType.IP)
                 .vpc(vpc)
-                .healthCheck(HealthCheck.builder().protocol(Protocol.HTTPS).timeout(Duration.seconds(120)).interval(Duration.seconds(240)).path("/status/health/ping").build())
+                .healthCheck(HealthCheck.builder().protocol(Protocol.HTTP).timeout(Duration.seconds(120)).interval(Duration.seconds(240)).path("/status/health/ping").build())
                 .build();
 
         final ApplicationLoadBalancer applicationLoadBalancer = ApplicationLoadBalancer.Builder.create(this, "alb")
