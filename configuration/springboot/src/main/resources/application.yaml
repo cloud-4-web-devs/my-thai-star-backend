@@ -24,3 +24,13 @@ management:
   health:
     status:
       order: DOWN,OUT_OF_SERVICE,UNKNOWN,WARN,UP
+
+spring:
+  datasource:
+    url: jdbc:postgresql://<set-db-endpoint>:5432/postgres
+    username: postgres
+    password: admin5432
+  jpa:
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.PostgreSQL81Dialect

@@ -1,6 +1,7 @@
 package cloud4webdevs.mythaistar.cdk;
 
 import software.amazon.awscdk.Duration;
+import software.amazon.awscdk.SecretValue;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.ec2.*;
 import software.amazon.awscdk.services.ecr.Repository;
@@ -9,6 +10,7 @@ import software.amazon.awscdk.services.elasticloadbalancingv2.*;
 import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.elasticloadbalancingv2.Protocol;
 import software.amazon.awscdk.services.logs.LogGroup;
+import software.amazon.awscdk.services.rds.*;
 import software.constructs.Construct;
 
 import java.util.*;
@@ -41,6 +43,7 @@ public class AwsTrainingInfra extends Stack {
                 .build();
         securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(80), "Application access");
         securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(443), "Access to ecr");
+        securityGroup.addIngressRule(Peer.ipv4(vpc.getVpcCidrBlock()), Port.tcp(5432), "Access to postgres");
 
         final ApplicationTargetGroup applicationTargetGroup = ApplicationTargetGroup.Builder.create(this, "tg")
                 .targetGroupName("tg-awstraining")
@@ -93,7 +96,7 @@ public class AwsTrainingInfra extends Stack {
 
         // Endpoints
         final String endpointPrefix = "com.amazonaws.eu-central-1.";
-        final String[] endpoints = {"ecr.api", "ecr.dkr", "logs", "ssm"};
+        final String[] endpoints = {"ecr.api", "ecr.dkr", "logs", "ssm", "rds"};
         for (final String id : endpoints){
             InterfaceVpcEndpoint.Builder.create(this, id)
                     .vpc(vpc)
@@ -104,5 +107,14 @@ public class AwsTrainingInfra extends Stack {
                             .build())
                     .build();
         }
+
+        DatabaseInstance db = DatabaseInstance.Builder.create(this, "rds-aurora")
+                .engine(DatabaseInstanceEngine.postgres(PostgresInstanceEngineProps.builder().version(PostgresEngineVersion.VER_13_6).build()))
+                .instanceType(InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.SMALL))
+                .vpc(vpc)
+                .securityGroups(new ArrayList<>(Collections.singletonList(securityGroup)))
+                .databaseName("postgres")
+                .credentials(Credentials.fromPassword("postgres", SecretValue.plainText("admin5432")))
+                .build();
     }
 }
