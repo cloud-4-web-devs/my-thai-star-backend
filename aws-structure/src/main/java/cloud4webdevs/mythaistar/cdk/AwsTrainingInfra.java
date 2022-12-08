@@ -11,8 +11,8 @@ import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.amazon.awscdk.services.elasticloadbalancingv2.Protocol;
 import software.amazon.awscdk.services.logs.LogGroup;
 import software.amazon.awscdk.services.rds.*;
+import software.amazon.awscdk.services.secretsmanager.ISecret;
 import software.constructs.Construct;
-
 import java.util.*;
 
 public class AwsTrainingInfra extends Stack {
@@ -80,9 +80,19 @@ public class AwsTrainingInfra extends Stack {
                 .memoryLimitMiB(512)
                 .build();
 
+        ISecret secret = software.amazon.awscdk.services.secretsmanager.Secret.Builder.create(this, "secret")
+                .secretName("cloud4devs")
+                .build();
+
+        Secret secretECS = Secret.fromSecretsManager(secret);
+
+        Map<String, Secret> secretArn = new HashMap();
+        secretArn.put("SPRING_APPLICATION_JSON", secretECS);
+
         taskDefinition.addContainer("taskDefinitionContainer", ContainerDefinitionOptions.builder()
                 .image(ContainerImage.fromEcrRepository(repository))
                 .portMappings(List.of(PortMapping.builder().containerPort(80).build()))
+                .secrets(secretArn)
                 .logging(LogDrivers.awsLogs(awsLogDriverProps))
                 .build());
 
