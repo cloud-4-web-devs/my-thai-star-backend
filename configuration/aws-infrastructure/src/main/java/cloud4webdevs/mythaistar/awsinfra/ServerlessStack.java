@@ -2,6 +2,8 @@ package cloud4webdevs.mythaistar.awsinfra;
 
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.Stack;
+import software.amazon.awscdk.services.apigateway.Cors;
+import software.amazon.awscdk.services.apigateway.CorsOptions;
 import software.amazon.awscdk.services.apigateway.LambdaRestApi;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
@@ -30,6 +32,10 @@ public class ServerlessStack extends Stack {
 
         LambdaRestApi.Builder.create(this, "MyThaiStarApi")
                 .handler(healthCheckFunction)
+                .defaultCorsPreflightOptions(CorsOptions.builder()
+                        .allowOrigins(Cors.ALL_ORIGINS)
+                        .allowMethods(Cors.ALL_METHODS)
+                        .build())
                 .build();
 
         dbClusterSecret.grantRead(healthCheckFunction);
