@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,maven,intellij+all,eclipse,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,maven,intellij+all,eclipse,visualstudiocode
 
+# AWS CDK
+configuration/aws-infrastructure/.cdk.staging
+configuration/aws-infrastructure/cdk.out
+
 ### Eclipse ###
 .metadata
 bin/

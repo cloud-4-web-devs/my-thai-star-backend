@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cloud-4-web-devs</groupId>
+        <artifactId>my-thai-star</artifactId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <groupId>cloud-4-web-devs.my-thai-star</groupId>
+    <artifactId>booking-adapter-in-lambda</artifactId>
+    <version>${revision}</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>cloud-4-web-devs.my-thai-star</groupId>
+            <artifactId>booking-application</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jr</groupId>
+            <artifactId>jackson-jr-objects</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.3.8</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>

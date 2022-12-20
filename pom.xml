@@ -22,6 +22,8 @@
         <lombok.version>1.18.20</lombok.version>
         <junit.version>5.7.2</junit.version>
         <mockito.version>3.11.2</mockito.version>
+        <aws-lambda-java-core.version>1.2.2</aws-lambda-java-core.version>
+        <jackson-jr-objects.version>2.14.1</jackson-jr-objects.version>
 
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
@@ -48,8 +50,12 @@
         <module>booking/booking-domain</module>
         <module>booking/booking-application</module>
         <module>booking/booking-adapter-in-springweb</module>
+        <module>booking/booking-adapter-in-lambda</module>
         <module>booking/booking-adapter-out-jpa</module>
+        <module>booking/booking-adapter-out-jdbc</module>
         <module>configuration/springboot</module>
+        <module>configuration/aws-infrastructure</module>
+        <module>configuration/serverless</module>
     </modules>
 
     <dependencies>
@@ -72,6 +78,21 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-lambda-java-core</artifactId>
+                <version>${aws-lambda-java-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jr</groupId>
+                <artifactId>jackson-jr-objects</artifactId>
+                <version>${jackson-jr-objects.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <!-- lock down plugins versions to avoid using Maven defaults -->
